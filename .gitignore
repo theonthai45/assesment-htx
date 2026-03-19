@@ -1,0 +1,23 @@
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# SQLite database
+backend/transcriptions.db
+
+# Test / tooling caches
+.mypy_cache/
+.pytest_cache/
+
+# Logs
+*.log
