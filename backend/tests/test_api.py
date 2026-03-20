@@ -4,16 +4,20 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
+# skip Whisper model loading during tests.
+os.environ["DISABLE_WHISPER"] = "1"
+
 from app.main import app  # noqa: E402
+from app.database import DB_PATH  # noqa: E402
 
-# Ran into deprecated function on_event is deprecated, use lifespan event handlers instead.
-# had to check for lifespan events instead
-
-@pytest_asyncio.fixture(scope="session", autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def _lifespan() -> None:
-    await app.router.startup()
-    yield
-    await app.router.shutdown()
+    # ensure the tests validate `init_db()` by starting from a clean DB.
+    if DB_PATH.exists():
+        DB_PATH.unlink()
+
+    async with app.router.lifespan_context(app):
+        yield
 
 
 @pytest.mark.asyncio

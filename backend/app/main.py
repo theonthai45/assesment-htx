@@ -20,8 +20,14 @@ AUDIO_DIR = Path(__file__).resolve().parent.parent / "audio_files"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: initialize DB and load model once
+    # initialize DB and load model once
     init_db()
+
+    # keep tests fast by disabling whisper
+    if os.getenv("DISABLE_WHISPER") == "1":
+        app.state.whisper_modal = None
+        yield
+        return
 
     if whisper is None:
         raise RuntimeError("openai-whisper is not installed or failed to import")
