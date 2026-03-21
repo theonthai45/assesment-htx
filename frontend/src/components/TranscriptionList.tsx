@@ -1,10 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from "react"
-import { RefreshCw } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
-  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -67,25 +64,13 @@ export function TranscriptionList({
     <Card>
       <CardHeader>
         <CardTitle>All Transcriptions</CardTitle>
-        <CardAction>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="text-muted-foreground"
-            onClick={() => refresh()}
-            aria-label="Refresh transcriptions"
-          >
-            <RefreshCw className="size-4" />
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent>
         {loading && (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Filename</TableHead>
+                <TableHead>File Name</TableHead>
                 <TableHead>Transcription</TableHead>
                 <TableHead>Created At</TableHead>
               </TableRow>

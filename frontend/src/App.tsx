@@ -1,14 +1,28 @@
-import { FileAudio, LayoutDashboard, Search, Upload } from "lucide-react"
+import { useCallback, useMemo, useState } from "react"
+import { FileAudio, LayoutDashboard } from "lucide-react"
 
 import { SearchBar } from "@/components/SearchBar"
 import { TranscriptionList } from "@/components/TranscriptionList"
 import { UploadForm } from "@/components/UploadForm"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTranscriptions } from "@/hooks/useTranscriptions"
 
 export function App() {
   const { transcriptions, loading, error, refresh } = useTranscriptions()
+  const [searchValue, setSearchValue] = useState("")
+  const [query, setQuery] = useState("")
+
+  const filteredTranscriptions = useMemo(() => {
+    const normalized = query.trim().toLowerCase()
+    if (!normalized) return transcriptions
+    return transcriptions.filter((item) =>
+      item.filename.toLowerCase().includes(normalized)
+    )
+  }, [query, transcriptions])
+
+  const handleDebouncedSearch = useCallback((value: string) => {
+    setQuery(value)
+  }, [])
 
   return (
     <div className="min-h-svh bg-muted/30 p-4 md:p-6">
@@ -46,9 +60,15 @@ export function App() {
           </Card>
 
           <UploadForm onUploadSuccess={refresh} />
-          <SearchBar />
+          <SearchBar
+            value={searchValue}
+            onChange={setSearchValue}
+            onDebouncedChange={handleDebouncedSearch}
+            totalCount={transcriptions.length}
+            filteredCount={filteredTranscriptions.length}
+          />
           <TranscriptionList
-            transcriptions={transcriptions}
+            transcriptions={filteredTranscriptions}
             loading={loading}
             error={error}
             refresh={refresh}
