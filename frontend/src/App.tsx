@@ -1,32 +1,59 @@
+import { FileAudio, LayoutDashboard, Search, Upload } from "lucide-react"
+
 import { SearchBar } from "@/components/SearchBar"
 import { TranscriptionList } from "@/components/TranscriptionList"
 import { UploadForm } from "@/components/UploadForm"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTranscriptions } from "@/hooks/useTranscriptions"
 
 export function App() {
   const { transcriptions, loading, error, refresh } = useTranscriptions()
 
   return (
-    <div className="min-h-svh bg-muted/30 py-10">
-      <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4">
-        <header className="text-center">
-          <h1 className="font-heading text-2xl font-semibold tracking-tight md:text-3xl">
-            Audio Transcriber
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Upload audio, search past files, and browse every stored
-            transcription in one place.
-          </p>
-        </header>
+    <div className="min-h-svh bg-muted/30 p-4 md:p-6">
+      <div className="mx-auto grid max-w-7xl gap-4 lg:grid-cols-[240px_1fr]">
+        <aside className="lg:sticky lg:top-6 lg:h-[calc(100svh-3rem)]">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <LayoutDashboard className="size-4" />
+                HTX Assessment Test
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
+                <FileAudio className="size-4" />
+                Audio Transcriber
+              </div>
+            </CardContent>
+          </Card>
+        </aside>
 
-        <UploadForm onUploadSuccess={refresh} />
-        <SearchBar />
-        <TranscriptionList
-          transcriptions={transcriptions}
-          loading={loading}
-          error={error}
-          refresh={refresh}
-        />
+        <main className="flex min-w-0 flex-col gap-4">
+          <Card>
+            <CardHeader className="gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle className="font-heading text-2xl font-semibold tracking-tight md:text-3xl">
+                  Audio Transcriber
+                </CardTitle>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Upload audio, search historical files, and expand any
+                transcription row to play back the original audio.
+              </p>
+            </CardHeader>
+          </Card>
+
+          <UploadForm onUploadSuccess={refresh} />
+          <SearchBar />
+          <TranscriptionList
+            transcriptions={transcriptions}
+            loading={loading}
+            error={error}
+            refresh={refresh}
+          />
+        </main>
       </div>
     </div>
   )

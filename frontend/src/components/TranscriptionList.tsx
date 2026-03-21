@@ -1,3 +1,4 @@
+import { Fragment, useCallback, useMemo, useState } from "react"
 import { RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/table"
 import type { Transcription } from "@/types"
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL as string
+
 export interface TranscriptionListProps {
   transcriptions: Transcription[]
   loading: boolean
@@ -38,6 +41,28 @@ export function TranscriptionList({
   error,
   refresh,
 }: TranscriptionListProps) {
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [audioLoadErrors, setAudioLoadErrors] = useState<Record<number, boolean>>(
+    {}
+  )
+
+  const toggleExpanded = useCallback((id: number) => {
+    setExpandedId((prev) => (prev === id ? null : id))
+  }, [])
+
+  const markAudioError = useCallback((id: number) => {
+    setAudioLoadErrors((prev) => ({ ...prev, [id]: true }))
+  }, [])
+
+  const audioSources = useMemo(() => {
+    return Object.fromEntries(
+      transcriptions.map((row) => [
+        row.id,
+        `${BASE_URL}/audio_files/${encodeURIComponent(row.filename)}`,
+      ])
+    ) as Record<number, string>
+  }, [transcriptions])
+
   return (
     <Card>
       <CardHeader>
@@ -104,17 +129,45 @@ export function TranscriptionList({
             </TableHeader>
             <TableBody>
               {transcriptions.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell className="max-w-[140px] truncate font-medium">
-                    {row.filename}
-                  </TableCell>
-                  <TableCell className="max-w-md whitespace-normal break-words">
-                    {row.transcription}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatCreatedAt(row.created_at)}
-                  </TableCell>
-                </TableRow>
+                <Fragment key={row.id}>
+                  <TableRow
+                    className="cursor-pointer"
+                    onClick={() => toggleExpanded(row.id)}
+                    aria-expanded={expandedId === row.id}
+                  >
+                    <TableCell className="max-w-[140px] truncate font-medium">
+                      {row.filename}
+                    </TableCell>
+                    <TableCell className="max-w-md whitespace-normal break-words">
+                      {row.transcription}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatCreatedAt(row.created_at)}
+                    </TableCell>
+                  </TableRow>
+                  {expandedId === row.id && (
+                    <TableRow className="bg-muted/20">
+                      <TableCell colSpan={3}>
+                        <div className="space-y-2 py-2">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            Audio playback
+                          </p>
+                          <audio
+                            controls
+                            className="w-full"
+                            src={audioSources[row.id]}
+                            onError={() => markAudioError(row.id)}
+                          />
+                          {audioLoadErrors[row.id] && (
+                            <p className="text-xs text-muted-foreground">
+                              Unable to load audio for this transcription.
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </Fragment>
               ))}
             </TableBody>
           </Table>
