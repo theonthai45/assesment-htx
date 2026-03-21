@@ -53,8 +53,6 @@ describe("UploadForm", () => {
     const file = new File(["x"], "clip.mp3", { type: "audio/mpeg" })
     await user.upload(input, file)
 
-    await user.click(screen.getByRole("button", { name: "Transcribe" }))
-
     expect(
       await screen.findByText("hello from test", {}, { timeout: 3000 })
     ).toBeInTheDocument()

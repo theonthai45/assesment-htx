@@ -44,14 +44,74 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
     inputRef.current?.click()
   }, [])
 
-  const onFilesSelected = useCallback((list: FileList | null) => {
-    if (!list?.length) return
-    const next: FileUploadState[] = Array.from(list).map((file) => ({
-      file,
-      status: "idle" as const,
-    }))
-    setFiles(next)
-  }, [])
+  const transcribeFiles = useCallback(
+    async (selectedFiles: FileUploadState[]) => {
+      if (!selectedFiles.length) return
+
+      const nextStates = [...selectedFiles]
+      let allSucceeded = true
+
+      for (let i = 0; i < nextStates.length; i++) {
+        const entry = nextStates[i]
+        if (!entry) continue
+
+        nextStates[i] = { ...entry, status: "uploading" }
+        setFiles([...nextStates])
+
+        try {
+          const formData = new FormData()
+          formData.append("file", entry.file)
+
+          const response = await fetch(`${BASE_URL}/transcribe`, {
+            method: "POST",
+            body: formData,
+          })
+
+          if (!response.ok) {
+            throw new Error(`Upload failed with status ${response.status}`)
+          }
+
+          const data: unknown = await response.json()
+          const result = parseTranscribeResponse(data)
+
+          nextStates[i] = {
+            ...entry,
+            status: "success",
+            result,
+          }
+        } catch (err) {
+          allSucceeded = false
+          const message =
+            err instanceof Error ? err.message : "Transcription failed"
+          nextStates[i] = {
+            ...entry,
+            status: "error",
+            error: message,
+          }
+        }
+
+        setFiles([...nextStates])
+      }
+
+      if (allSucceeded && nextStates.every((f) => f.status === "success")) {
+        onUploadSuccess()
+      }
+    },
+    [onUploadSuccess]
+  )
+
+  const onFilesSelected = useCallback(
+    (list: FileList | null) => {
+      if (!list?.length) return
+      const next: FileUploadState[] = Array.from(list).map((file) => ({
+        file,
+        status: "idle" as const,
+      }))
+      setFiles(next)
+      void transcribeFiles(next)
+    },
+    [transcribeFiles]
+  )
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -72,59 +132,6 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
   }, [])
-
-  const transcribeAll = useCallback(async () => {
-    if (!files.length) return
-
-    const nextStates = [...files]
-    let allSucceeded = true
-
-    for (let i = 0; i < nextStates.length; i++) {
-      const entry = nextStates[i]
-      if (!entry) continue
-
-      nextStates[i] = { ...entry, status: "uploading" }
-      setFiles([...nextStates])
-
-      try {
-        const formData = new FormData()
-        formData.append("file", entry.file)
-
-        const response = await fetch(`${BASE_URL}/transcribe`, {
-          method: "POST",
-          body: formData,
-        })
-
-        if (!response.ok) {
-          throw new Error(`Upload failed with status ${response.status}`)
-        }
-
-        const data: unknown = await response.json()
-        const result = parseTranscribeResponse(data)
-
-        nextStates[i] = {
-          ...entry,
-          status: "success",
-          result,
-        }
-      } catch (err) {
-        allSucceeded = false
-        const message =
-          err instanceof Error ? err.message : "Transcription failed"
-        nextStates[i] = {
-          ...entry,
-          status: "error",
-          error: message,
-        }
-      }
-
-      setFiles([...nextStates])
-    }
-
-    if (allSucceeded && nextStates.every((f) => f.status === "success")) {
-      onUploadSuccess()
-    }
-  }, [files, onUploadSuccess])
 
   return (
     <Card>
@@ -164,9 +171,6 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
 
         {files.length > 0 && (
           <div className="flex flex-col gap-3">
-            <Button type="button" onClick={() => void transcribeAll()}>
-              Transcribe
-            </Button>
             <ul className="flex flex-col gap-3">
               {files.map((item) => (
                 <li
