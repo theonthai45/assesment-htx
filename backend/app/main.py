@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .database import get_connection, init_db
 from .utils import save_upload_file
@@ -14,8 +15,10 @@ try:
 except Exception:  # pragma: no cover
     whisper = None  # type: ignore
 
-
+# This is where the audio files are stored
 AUDIO_DIR = Path(__file__).resolve().parent.parent / "audio_files"
+# This is to make sure the audio files are created
+AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @asynccontextmanager
@@ -41,6 +44,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+# This will allow me to serve the audio files from the backend
+app.mount("/audio_files", StaticFiles(directory=AUDIO_DIR), name="audio_files")
 
 # Make sure this allows origin so there wont be a CORS issue
 app.add_middleware(
