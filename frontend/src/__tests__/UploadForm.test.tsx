@@ -32,6 +32,31 @@ describe("UploadForm", () => {
     expect(screen.getByText("clip.mp3")).toBeInTheDocument()
   })
 
+  it("it should call the API to transcribe audio when the user selects a file", async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        filename: "clip.mp3",
+        transcription: "hello from test",
+      }),
+    })
+    vi.stubGlobal("fetch", fetchMock)
+
+    render(<UploadForm onUploadSuccess={vi.fn()} />)
+
+    const input = document.querySelector(
+      'input[type="file"]'
+    ) as HTMLInputElement
+    const file = new File(["x"], "clip.mp3", { type: "audio/mpeg" })
+    await user.upload(input, file)
+
+    expect(fetchMock).toHaveBeenCalled()
+    const [url, init] = fetchMock.mock.calls[0] ?? []
+    expect(String(url)).toContain("/transcribe")
+    expect(init).toMatchObject({ method: "POST" })
+  })
+
   it("it should show a success badge after a successful upload", async () => {
     const user = userEvent.setup()
     vi.stubGlobal(

@@ -23,7 +23,6 @@ export interface TranscriptionListProps {
   transcriptions: Transcription[]
   loading: boolean
   error: string | null
-  refresh: () => void
 }
 
 function formatCreatedAt(iso: string): string {
@@ -36,7 +35,6 @@ export function TranscriptionList({
   transcriptions,
   loading,
   error,
-  refresh,
 }: TranscriptionListProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [audioLoadErrors, setAudioLoadErrors] = useState<Record<number, boolean>>(
@@ -107,7 +105,7 @@ export function TranscriptionList({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Filename</TableHead>
+                <TableHead>File Name</TableHead>
                 <TableHead>Transcription</TableHead>
                 <TableHead>Created At</TableHead>
               </TableRow>

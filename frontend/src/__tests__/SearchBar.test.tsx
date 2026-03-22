@@ -76,4 +76,20 @@ describe("SearchBar", () => {
 
     expect(screen.getByText("Showing all 12 transcriptions")).toBeInTheDocument()
   })
+
+  it("it should show filtered count text when the search input has a value", () => {
+    render(
+      <SearchBar
+        value="sample"
+        onChange={vi.fn()}
+        onDebouncedChange={vi.fn()}
+        totalCount={10}
+        filteredCount={3}
+      />
+    )
+
+    expect(
+      screen.getByText("Showing 3 of 10 transcriptions")
+    ).toBeInTheDocument()
+  })
 })

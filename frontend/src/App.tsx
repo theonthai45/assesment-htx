@@ -71,7 +71,6 @@ export function App() {
             transcriptions={filteredTranscriptions}
             loading={loading}
             error={error}
-            refresh={refresh}
           />
         </main>
       </div>
