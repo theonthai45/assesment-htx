@@ -63,8 +63,8 @@ npm run test:ui
 ### Backend container
 
 ```bash
-docker build -t transcription-backend ./backend
-docker run --rm -p 8000:8000 transcription-backend
+docker build -t htx-backend ./backend
+docker run --rm -p 8000:8000 htx-backend
 ```
 
 Then open `http://localhost:8000/health` (API root: `http://localhost:8000`; interactive docs: `/docs`).
