@@ -133,6 +133,7 @@ docker run --rm -p 3000:80 htx-frontend
 ```
 
 ## Assumptions
+- **gitignore has .env files** and is purposely done this way for demo purposes.
 - **Whisper tiny is pre-downloaded**: model weights are fetched at Docker build time to avoid cold starts.
 - **Open CORS**: `allow_origins=["*"]` is used for local dev/assessment simplicity.
 - **Local file storage**: uploaded audio is stored inside the container filesystem (no persistent volume required for assessment).
