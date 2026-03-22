@@ -14,6 +14,49 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - **Health check**: `GET http://localhost:8000/health`
 
+## Unit tests
+
+Run backend and frontend tests from the repository root (or after `cd` into each project).
+
+### Backend (pytest)
+
+From the repo root, with dependencies installed (same virtual environment as local development):
+
+```bash
+cd backend
+pytest
+```
+
+Run a single file or verbose output if needed:
+
+```bash
+cd backend
+pytest tests/ -v
+```
+
+### Frontend (Vitest)
+
+Install dependencies once, then run the test suite:
+
+```bash
+cd frontend
+npm install
+npm run test -- --run
+```
+
+`--run` executes tests once and exits (suitable for CI). Omit it for watch mode while developing:
+
+```bash
+cd frontend
+npm run test
+```
+
+Optional browser UI for Vitest:
+
+```bash
+cd frontend
+npm run test:ui
+```
 
 ## Docker
 
@@ -24,7 +67,7 @@ docker build -t transcription-backend ./backend
 docker run --rm -p 8000:8000 transcription-backend
 ```
 
-Then open `http://localhost:3000`.
+Then open `http://localhost:8000/health` (API root: `http://localhost:8000`; interactive docs: `/docs`).
 
 ### Frontend container
 
