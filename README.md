@@ -1,24 +1,60 @@
 # HTX assessment test
 
-## Local development
+## Local machine setup
 
-### Backend (FastAPI)
+### Prerequisites
+
+| Tool | Notes |
+| --- | --- |
+| **Python** | 3.10 or newer (aligned with `backend/Dockerfile`). |
+| **Node.js** | Current LTS and **npm**, for the frontend. |
+| **ffmpeg** | Required on the host for OpenAI Whisper to decode audio (same as the backend Docker image). Install with your OS package manager (e.g. `brew install ffmpeg` on macOS, `apt install ffmpeg` on Debian/Ubuntu). |
+
+### One-time environment setup
+
+**Backend (Python virtual environment and dependencies)**
 
 ```bash
 cd backend
 python3 -m venv .venv
-. .venv/bin/activate
+source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+On Windows (PowerShell), activate with `.\.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate`.
+
+**Frontend (npm packages)**
+
+```bash
+cd frontend
+npm install
+```
+
+Run these once per clone or when dependencies change. Then use [Local development](#local-development) to run the app and [Unit tests](#unit-tests) to verify everything.
+
+## Local development
+
+### Backend (FastAPI)
+
+From the **repository root**, activate the venv then start the API (see [One-time environment setup](#one-time-environment-setup) if `.venv` does not exist yet):
+
+```bash
+source backend/.venv/bin/activate
+cd backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+If your shell is already in `backend` with the venv active, run only `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`.
 
 - **Health check**: `GET http://localhost:8000/health`
 
 ### Frontend (Vite)
 
+After `npm install` (see [One-time environment setup](#one-time-environment-setup)):
+
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
 
