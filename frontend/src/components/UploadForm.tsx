@@ -1,3 +1,7 @@
+/**
+ * Batch upload: `multiple` on the file input and sequential POST /transcribe
+ * Each file gets its own status row
+ */
 import {
   useCallback,
   useRef,

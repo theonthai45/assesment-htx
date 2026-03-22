@@ -1,3 +1,5 @@
+// Type setting so that it's be easier down the road
+
 export interface Transcription {
   id: number
   filename: string

@@ -28,8 +28,7 @@ export function SearchBar({
     return () => {
       window.clearTimeout(timeout)
     }
-  }, [debounceMs, onDebouncedChange, value]) 
-
+  }, [debounceMs, onDebouncedChange, value])
   // Make sure that there is a query and it is not just empty spaces
   const hasQuery = value.trim().length > 0
 

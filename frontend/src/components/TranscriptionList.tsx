@@ -1,3 +1,8 @@
+/**
+ * Read-only grid of stored transcriptions. Rows expand to an <audio> element
+ * whose src points at the backend static mount `/audio_files/<filename>` so
+ * playback does not require re-uploading blobs from the browser.
+ */
 import { Fragment, useCallback, useMemo, useState } from "react"
 
 import {
@@ -50,6 +55,7 @@ export function TranscriptionList({
   }, [])
 
   const audioSources = useMemo(() => {
+    // encodeURIComponent keeps odd characters in stored filenames valid in URLs.
     return Object.fromEntries(
       transcriptions.map((row) => [
         row.id,

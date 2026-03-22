@@ -12,7 +12,7 @@ from app.database import DB_PATH  # noqa: E402
 
 @pytest_asyncio.fixture(autouse=True)
 async def _lifespan() -> None:
-    # ensure the tests validate `init_db()` by starting from a clean DB.
+    # reset DB file per test run so there won't be persistance
     if DB_PATH.exists():
         DB_PATH.unlink()
 
