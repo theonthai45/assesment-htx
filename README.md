@@ -14,6 +14,16 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - **Health check**: `GET http://localhost:8000/health`
 
+### Frontend (Vite)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite serves the app (by default at `http://localhost:5173` the terminal prints the exact URL). Ensure `VITE_API_BASE_URL` points at your API—`frontend/.env` is set to `http://localhost:8000`, so run the backend on port **8000** for full-stack local development.
+
 ## Unit tests
 
 Run backend and frontend tests from the repository root (or after `cd` into each project).
@@ -41,7 +51,7 @@ Install dependencies once, then run the test suite:
 ```bash
 cd frontend
 npm install
-npm run test -- --run
+npm run test --run
 ```
 
 `--run` executes tests once and exits (suitable for CI). Omit it for watch mode while developing:
@@ -51,12 +61,6 @@ cd frontend
 npm run test
 ```
 
-Optional browser UI for Vitest:
-
-```bash
-cd frontend
-npm run test:ui
-```
 
 ## Docker
 
@@ -93,7 +97,6 @@ docker run --rm -p 3000:80 htx-frontend
 ```
 
 ## Assumptions
-- **SQLite is sufficient**: expected low concurrency, no heavy concurrent writes.
 - **Whisper tiny is pre-downloaded**: model weights are fetched at Docker build time to avoid cold starts.
 - **Open CORS**: `allow_origins=["*"]` is used for local dev/assessment simplicity.
 - **Local file storage**: uploaded audio is stored inside the container filesystem (no persistent volume required for assessment).
